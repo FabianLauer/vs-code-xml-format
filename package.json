@@ -1,10 +1,16 @@
 {
 	"name": "vs-code-xml-format",
+	"displayName": "XML Formatter",
 	"description": "A simple XML formatter for VS Code.",
 	"version": "0.0.2",
-	"publisher": "Softwareschmiede Saar",
+	"publisher": "fabianlauer",
 	"author": "Fabian Lauer",
 	"homepage": "https://github.com/FabianLauer/vs-code-xml-format",
+	"icon": "icon.png",
+	"galleryBanner": {
+		"color": "#f79627",
+		"theme": "dark"
+	},
 	"bugs": {
 		"url": "https://github.com/FabianLauer/vs-code-xml-format/issues"
 	},
@@ -16,7 +22,7 @@
 		"vscode": "^0.10.1"
 	},
 	"categories": [
-		"Other"
+		"Languages", "Other"
 	],
 	"activationEvents": [
 		"onLanguage:xml",
