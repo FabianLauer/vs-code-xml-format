@@ -72,24 +72,25 @@ interface IXmlParserDeclarationNode {
 
 class XmlFormatter {
 	/**
-	 * 
+	 * Format a text range and return a text edit array compatible with VS Code formatting providers.
 	 */
 	public static format(document: vscode.TextDocument, range: vscode.Range, options: vscode.FormattingOptions): vscode.TextEdit[] {
-		return new XmlFormatter(document).__format(range, options);
+		return new XmlFormatter(document).format(range, options);
 	}
 	
 	
 	/**
-	 * **Use the static method `XmlFormatter.formatCurrentDocument()` for easy formatting of the current document.**
-	 * @param _editor The VS Code text editor to format XML in.
+	 * **You can use the static method `XmlFormatter.format()` instead of instantiating manually.**
+	 * @param _document The VS Code document to format.
 	 */
 	constructor(private _document: vscode.TextDocument) { }
 	
 	
 	/**
+	 * Format a text range and return a text edit array compatible with VS Code formatting providers.
 	 * TODO: Use formatting options provided by VS code.
 	 */
-	public __format(range: vscode.Range, options: vscode.FormattingOptions): vscode.TextEdit[] {
+	public format(range: vscode.Range, options: vscode.FormattingOptions): vscode.TextEdit[] {
 		// format the whole document if no range is provided by VS code
 		range = range || new vscode.Range(
 			// line 0, char 0:
