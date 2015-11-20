@@ -6,8 +6,18 @@
 import * as vscode from 'vscode'; 
 
 export function activate(context: vscode.ExtensionContext) {
-	context.subscriptions.push(vscode.commands.registerCommand('extension.formatXml', () => {
-		XmlFormatter.formatCurrentDocument();
+	// whole document formatting
+	context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider('xml', {
+		provideDocumentFormattingEdits: (document, options) => {
+			return XmlFormatter.format(document, undefined, options);
+		}
+	}));
+	
+	// selection formatting
+	context.subscriptions.push(vscode.languages.registerDocumentRangeFormattingEditProvider('xml', {
+		provideDocumentRangeFormattingEdits: (document, range, options) => {
+			return XmlFormatter.format(document, range, options);
+		}
 	}));
 }
 
@@ -62,25 +72,10 @@ interface IXmlParserDeclarationNode {
 
 class XmlFormatter {
 	/**
-	 * Formats XML in the current editor.
+	 * 
 	 */
-	public static formatCurrentDocument(): void {
-		var editor = vscode.window.activeTextEditor;
-		
-		// cancel if there's no editor or if the editor has no document (can that even happen?)
-		if (!editor || !editor.document) {
-			return;
-		}
-		
-		
-		// check whether the current document's language is supported first of all and, if it's not,
-		// show a warning message and cancel
-		if (!this._checkLanguageSupport(editor.document.languageId)) {
-			XmlFormatter._showUnsupportedLanguageMessage(editor.document.languageId);
-			return;
-		}
-	
-		new XmlFormatter(editor).format();
+	public static format(document: vscode.TextDocument, range: vscode.Range, options: vscode.FormattingOptions): vscode.TextEdit[] {
+		return new XmlFormatter(document).__format(range, options);
 	}
 	
 	
@@ -88,48 +83,47 @@ class XmlFormatter {
 	 * **Use the static method `XmlFormatter.formatCurrentDocument()` for easy formatting of the current document.**
 	 * @param _editor The VS Code text editor to format XML in.
 	 */
-	constructor(private _editor: vscode.TextEditor) { }
+	constructor(private _document: vscode.TextDocument) { }
 	
 	
 	/**
-	 * Formats the current editor's whole document. 
+	 * TODO: Use formatting options provided by VS code.
 	 */
-	public format(): void {
-		this._editor.edit(editBuilder => {
-			// parse the unformatted XML string
-			let parsedXml = this._parseXmlString(this._editor.document.getText());
+	public __format(range: vscode.Range, options: vscode.FormattingOptions): vscode.TextEdit[] {
+		// format the whole document if no range is provided by VS code
+		range = range || new vscode.Range(
+			// line 0, char 0:
+			0, 0,
+			// last line:
+			this._document.lineCount,
+			// last character:
+			this._document.lineAt(this._document.lineCount - 1).range.end.character
+		);
+		
+	
+		// parse the unformatted XML string
+		let parsedXml = this._parseXmlString(this._document.getText());
+		
+		if (parsedXml) {
+			let formattedXml: string;
 			
-			if (parsedXml) {
-				let formattedXml: string;
-				
-				// try to format or show an error message in case formatting fails
-				try {
-					formattedXml = this._formatParsedXml(parsedXml);
-					console.log(JSON.stringify(parsedXml, null, '\t'));
-				} catch(err) {
-					// formatting failed, show an error message and cancel (original document is unchanged)
-					XmlFormatter._showFormattingErrorMessage();
-					return;
-				}
-				
-				// the range we're about to replace (the complete document)
-				let range = new vscode.Range(
-					// line 0, char 0:
-					0, 0,
-					// last line:
-					this._editor.document.lineCount,
-					// last character:
-					this._editor.document.lineAt(this._editor.document.lineCount - 1).range.end.character
-				);
-				
-				// replace the unformatted XML with the formatted XML and we're done
-				editBuilder.replace(range, formattedXml);
-			}
-			// the parser didn't return anything we can use, show an error message and return
-			else {
+			// try to format or show an error message in case formatting fails
+			try {
+				formattedXml = this._formatParsedXml(parsedXml);
+			} catch(err) {
+				// formatting failed, show an error message and cancel (original document is unchanged)
 				XmlFormatter._showFormattingErrorMessage();
+				return;
 			}
-		});
+			
+			// formatting worked, we're done
+			return [new vscode.TextEdit(range, formattedXml)];
+		}
+		// the parser didn't return anything we can use, show an error message and return
+		else {
+			XmlFormatter._showFormattingErrorMessage();
+			return;
+		}
 	}
 	
 	
@@ -146,15 +140,6 @@ class XmlFormatter {
 			case 'html':
 				return true;
 		}
-	}
-	
-	
-	/**
-	 * Displays a message that informs the user about an unsupported language.
-	 * @param languageId The VS Code language ID of the unsupported language. 
-	 */
-	private static _showUnsupportedLanguageMessage(languageId: string): void {
-		vscode.window.showWarningMessage(`Sorry, the language '${languageId}' can not be formatted as XML.`);
 	}
 	
 	
@@ -219,7 +204,7 @@ class XmlFormatter {
 	
 	
 	/**
-	 * Converts XML objects parsed with method `_parseXmlString(...)` to a formatted string. This recursively self-calles to
+	 * Converts XML objects parsed with method `_parseXmlString(...)` to a formatted string. This recursively self-calls to
 	 * convert child nodes of either the root node or any of its children to formatted XML strings.
 	 * @param xmlNode An XML object created using method `_parsedXmlString(...)`.
 	 * @param indentDepth The absolute indention depth for the returned string. Any recursive calls to this method will increment
@@ -317,7 +302,7 @@ class XmlFormatter {
 		
 		// add a leading space if necessary
 		if (xml.length > 0) {
-			xml = xml + '';
+			xml = ' ' + xml;
 		}
 		
 		// remove the trailing space and return
