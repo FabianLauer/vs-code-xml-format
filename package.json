@@ -4,6 +4,14 @@
 	"version": "0.0.2",
 	"publisher": "Softwareschmiede Saar",
 	"author": "Fabian Lauer",
+	"homepage": "https://github.com/FabianLauer/vs-code-xml-format",
+	"bugs": {
+		"url": "https://github.com/FabianLauer/vs-code-xml-format/issues"
+	},
+	"repository": {
+        "type": "git",
+        "url": "https://github.com/FabianLauer/vs-code-xml-format"
+    },	
 	"engines": {
 		"vscode": "^0.10.1"
 	},
