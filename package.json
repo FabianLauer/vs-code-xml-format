@@ -2,7 +2,7 @@
 	"name": "vs-code-xml-format",
 	"displayName": "XML Formatter",
 	"description": "A simple XML formatter for VS Code.",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"publisher": "fabianlauer",
 	"author": "Fabian Lauer",
 	"homepage": "https://github.com/FabianLauer/vs-code-xml-format",
