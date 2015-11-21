@@ -1,9 +1,19 @@
 # XML Formatting for VS Code
 
+
+**https://marketplace.visualstudio.com/items/fabianlauer.vs-code-xml-format**
+
+
 A simple wrapper around https://github.com/segmentio/xml-parser for formatting XML in VS Code. Currently, 
 only complete documents can be formatted. Formatting selections is planned.
 
-**This plugin is at a very early stage — you should expect bugs.**
+
+
+## Usage
+![usage](http://i.giphy.com/t4TrZOgcgPsaY.gif)
+
+Open an XML document, press Ctrl+Alt+P and enter 'Format Code'.
+
 
 ## License
 
