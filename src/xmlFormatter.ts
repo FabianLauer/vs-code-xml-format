@@ -99,11 +99,15 @@ export class XmlFormatter {
 	
 	
 	/**
-	 * Returns one or more characters that are supposed to be used as line breaks in formatted XML.
+	 * Returns one or more characters that are supposed to be used as line breaks in formatted XML. Currently,
+	 * the line break character(s) is determined automatically depending on what is predominantly used in the
+	 * document's text (not the formatting range as we'll want to align XML pasted in the document to match
+	 * the document's line breaks after formatting).
 	 * TODO: Check whether VS code provides info about the current document's newline type and use that instead.
 	 */
 	private _getLineBreakCharacters(): string {
-		return '\n';
+		this._lineBreakCharacter = this._lineBreakCharacter || XmlFormatter._determineLinebreakCharacter(this._document.getText());
+		return this._lineBreakCharacter;
 	}
 	
 	
@@ -263,4 +267,24 @@ export class XmlFormatter {
 		// remove the trailing space and return
 		return xml.slice(0, -1);
 	}
+	
+	
+	/**
+	 * Determines what type of line break is predominantly used in a string and returns that character.
+	 */
+	private static _determineLinebreakCharacter(text: string): string {
+		const crlfCount = (text.match(/\r\n/) || []).length,
+			  lfCount = (text.match(/[^\r]\n/) || []).length;
+		if (crlfCount > lfCount) {
+			return '\r\n';
+		} else {
+			return '\n';
+		}
+	}
+	
+	
+	/**
+	 * This is determined just in time using static method `_determineLinebreakCharacter(...)`.
+	 */
+	private _lineBreakCharacter: string;
 }
