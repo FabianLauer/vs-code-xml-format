@@ -6,7 +6,7 @@ export class XmlFormatter {
 	 * Format a text range and return a text edit array compatible with VS Code formatting providers.
 	 */
 	public static format(document: vscode.TextDocument, range: vscode.Range, options: vscode.FormattingOptions): vscode.TextEdit[] {
-		return new XmlFormatter(document).format(range, options);
+		return new XmlFormatter(document, options).format(range);
 	}
 	
 	
@@ -14,14 +14,29 @@ export class XmlFormatter {
 	 * **You can use the static method `XmlFormatter.format()` instead of instantiating manually.**
 	 * @param _document The VS Code document to format.
 	 */
-	constructor(private _document: vscode.TextDocument) { }
+	constructor(private _document: vscode.TextDocument, private _options?: vscode.FormattingOptions) {
+		this._options = this._options || {
+			insertSpaces: false,
+			tabSize: 4
+		};
+		
+		if (typeof this._options.insertSpaces === 'undefined') {
+			this._options.insertSpaces = false;
+			this._options.tabSize = 4;
+		}
+		
+		if (typeof this._options.tabSize !== 'number' || isNaN(this._options.tabSize)) {
+			this._options.tabSize = 4;
+		}
+		
+		this._options.tabSize = Math.max(0, 4);
+	}
 	
 	
 	/**
 	 * Format a text range and return a text edit array compatible with VS Code formatting providers.
-	 * TODO: Use formatting options provided by VS code.
 	 */
-	public format(range: vscode.Range, options: vscode.FormattingOptions): vscode.TextEdit[] {
+	public format(range: vscode.Range): vscode.TextEdit[] {
 		// format the whole document if no range is provided by VS code
 		range = range || new vscode.Range(
 			// line 0, char 0:
@@ -94,11 +109,19 @@ export class XmlFormatter {
 	
 	/**
 	 * Returns one or more characters that are supposed to be used as indention in formatted XML.
-	 * TODO: Check whether VS code provides info about the current document's indent mode (tabs, spaces? how many?)
-	 *       and use that instead.
 	 */
 	private _getIndentCharacters(): string {
-		return '\t';
+		var str  = '';
+		
+		if (this._options.insertSpaces) {
+			str = '';
+			while (str.length < this._options.tabSize) {
+				str += ' ';
+			}
+			return str;
+		} else {
+			return '\t';
+		}
 	}
 	
 	
