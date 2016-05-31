@@ -4,7 +4,7 @@
 **https://marketplace.visualstudio.com/items/fabianlauer.vs-code-xml-format**
 
 
-A simple wrapper around https://github.com/segmentio/xml-parser for formatting XML in VS Code. Currently, 
+A simple wrapper around https://github.com/FabianLauer/tsxml/ for formatting XML in VS Code. Currently, 
 only complete documents can be formatted. Formatting selections is planned.
 
 
