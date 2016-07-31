@@ -2142,6 +2142,10 @@ var Parser = function () {
             //     <alpha ...
             //     ^      we're here
             this.advanceToNextToken();
+            // check for illegal characters at the beginning of the tag name
+            if (this.getCurrentToken() === '.') {
+                this.raiseError(this.createSyntaxErrorAtCurrentToken(SyntaxErrorCode_1.SyntaxErrorCode.InvalidTagName, 'expected beginning of tag name, got \'' + this.getCurrentToken() + '\''));
+            }
             //     <alpha
             //      ^      we're here
             this.parseCompleteOpeningTagInto(node, true, false);
@@ -2454,7 +2458,7 @@ var Parser = function () {
             //     <alpha"FOO"/>
             //           ^
             if (!Parser.isWhitespaceToken(this.getCurrentToken()) && this.getCurrentToken() !== '/' && this.getCurrentToken() !== '>') {
-                if (!(allowSystemLiterals && (this.getCurrentToken() !== '"' || this.getCurrentToken() !== '\''))) {
+                if (!allowSystemLiterals && this.getCurrentToken() === '"') {
                     this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken('expected whitespace or end of opening tag'));
                 }
             }
@@ -2463,13 +2467,12 @@ var Parser = function () {
                 this.advanceToNextToken();
             }
             // if there's no alphabetic token here, there are no attributes to be parsed
-            if (!Parser.isAlphabeticToken(this.getCurrentToken()) && !(allowSystemLiterals && (this.getCurrentToken() !== '"' || this.getCurrentToken() !== '\''))) {
+            if (!Parser.isAlphabeticToken(this.getCurrentToken()) && !allowSystemLiterals && this.getCurrentToken() !== '"') {
                 return;
             }
-            var i = 0;
             // advance until there are no attributes and literals to be parsed
-            while (this.getCurrentToken() !== '>' && this.getCurrentToken() !== '/' && this.getCurrentToken() !== '?' && i++ < 10) {
-                if (this.getCurrentToken() === '"' || this.getCurrentToken() === '\'') {
+            while (this.getCurrentToken() !== '>' && this.getCurrentToken() !== '/' && this.getCurrentToken() !== '?') {
+                if (this.getCurrentToken() === '"') {
                     if (!allowSystemLiterals) {
                         this.raiseError(this.createUnexpectedTokenSyntaxErrorAtCurrentToken('system literal not allowed on this node'));
                     }
@@ -2501,11 +2504,8 @@ var Parser = function () {
             var valueQuoteCharacter = this.getCurrentToken();
             while (!this.isAtEndOfInput()) {
                 this.advanceToNextToken();
-                if (this.getCurrentToken() === valueQuoteCharacter && this.getPreviousToken() !== '\\') {
+                if (this.getCurrentToken() === valueQuoteCharacter) {
                     break;
-                }
-                if (this.getCurrentToken() === '\\' && this.getNextToken() === valueQuoteCharacter) {
-                    continue;
                 }
                 value += this.getCurrentToken();
             }
@@ -2560,16 +2560,13 @@ var Parser = function () {
                 } else {
                     return getAttrInfo();
                 }
-            } else {}
+            }
             value = '';
             while (!this.isAtEndOfInput()) {
                 this.advanceToNextToken();
-                if (this.getCurrentToken() === valueQuoteCharacter && this.getPreviousToken() !== '\\') {
+                if (this.getCurrentToken() === valueQuoteCharacter) {
                     this.advanceToNextToken();
                     break;
-                }
-                if (this.getCurrentToken() === '\\' && this.getNextToken() === valueQuoteCharacter) {
-                    continue;
                 }
                 value += this.getCurrentToken();
             }
@@ -2702,7 +2699,7 @@ var Parser = function () {
     }, {
         key: 'isTokenLegalInTagNameOrTagNameNamespacePrefix',
         value: function isTokenLegalInTagNameOrTagNameNamespacePrefix(token) {
-            return Parser.isAlphabeticToken(token) || Parser.isNumericToken(token) || token[0] === '-' || token[0] === '_';
+            return Parser.isAlphabeticToken(token) || Parser.isNumericToken(token) || token[0] === '-' || token[0] === '_' || token[0] === '.';
         }
     }, {
         key: 'isTokenLegalInAttributeNameOrAttributeNameNameNamespacePrefix',
@@ -2839,6 +2836,7 @@ exports.SyntaxError = SyntaxError;
     SyntaxErrorCode[SyntaxErrorCode["IllegalNamespacePrefix"] = 4] = "IllegalNamespacePrefix";
     SyntaxErrorCode[SyntaxErrorCode["IllegalSelfClose"] = 5] = "IllegalSelfClose";
     SyntaxErrorCode[SyntaxErrorCode["ExcessCloseTag"] = 6] = "ExcessCloseTag";
+    SyntaxErrorCode[SyntaxErrorCode["InvalidTagName"] = 7] = "InvalidTagName";
 })(exports.SyntaxErrorCode || (exports.SyntaxErrorCode = {}));
 var SyntaxErrorCode = exports.SyntaxErrorCode;
 },{}],20:[function(_dereq_,module,exports){
