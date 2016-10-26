@@ -70,5 +70,10 @@ export class XmlFormatter {
 		} else {
 			vscode.window.showErrorMessage(`XML formatting failed.`);
 		}
+		try {
+			console.log('XML Formatter: Error: ', errorInfo);
+		} catch (err) {
+			// ignore
+		}
 	}
 }
