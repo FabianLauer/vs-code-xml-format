@@ -40,6 +40,6 @@
     "vscode": "^0.10.1"
   },
   "dependencies": {
-    "xml-parser": "^1.2.1"
+    "tsxml": "^0.1.0"
   }
 }

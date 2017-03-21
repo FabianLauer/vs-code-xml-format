@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-const xml = require('./tsxml.js');
+import * as xml from 'tsxml';
 
 export class XmlFormatter {
 	/**
