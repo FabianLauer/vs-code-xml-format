@@ -30,7 +30,7 @@ class XmlFormatter {
 			tabSize: 4
 		};
 
-		if (typeof this.options.insertSpaces === 'undefined') {
+		if (typeof this.options.insertSpaces === undefined) {
 			this.options.insertSpaces = false;
 			this.options.tabSize = 4;
 		}
