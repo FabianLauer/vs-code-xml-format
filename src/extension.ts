@@ -38,13 +38,11 @@ class XmlFormatter {
 
 		if (typeof this.options.insertSpaces === undefined) {
 			this.options.insertSpaces = false;
-			this.options.tabSize = 4;
 		}
 
 		if (typeof this.options.tabSize !== 'number' || isNaN(this.options.tabSize)) {
 			this.options.tabSize = 4;
 		}
-
 		this.options.tabSize = Math.max(0, 4);
 	}
 
