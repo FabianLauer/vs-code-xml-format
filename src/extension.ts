@@ -15,16 +15,22 @@ class XmlFormatter {
 	/**
 	 * Format a text range and return a text edit array compatible with VS Code formatting providers.
 	 */
-	public static format(document: vscode.TextDocument, range: vscode.Range, options: vscode.FormattingOptions): Promise<vscode.TextEdit[]> {
+	public static format(
+		document: vscode.TextDocument,
+		range: vscode.Range,
+		options: vscode.FormattingOptions
+	): Promise<vscode.TextEdit[]> {
 		return new XmlFormatter(document, options).format(range);
 	}
 
 
 	/**
-	 * **You can use the static method `XmlFormatter.format()` instead of instantiating manually.**
-	 * @param _document The VS Code document to format.
+	 * @param document The VS Code document to format.
 	 */
-	constructor(private document: vscode.TextDocument, private options?: vscode.FormattingOptions) {
+	public constructor(
+		private document: vscode.TextDocument,
+		private options?: vscode.FormattingOptions
+	) {
 		this.options = this.options || {
 			insertSpaces: false,
 			tabSize: 4
