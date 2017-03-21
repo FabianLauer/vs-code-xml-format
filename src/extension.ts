@@ -28,8 +28,8 @@ class XmlFormatter {
 	 * @param document The VS Code document to format.
 	 */
 	public constructor(
-		private document: vscode.TextDocument,
-		private options?: vscode.FormattingOptions
+		private readonly document: vscode.TextDocument,
+		private readonly options?: vscode.FormattingOptions
 	) {
 		this.options = this.options || {
 			insertSpaces: false,
